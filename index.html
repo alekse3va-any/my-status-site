@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Статус системы | On / Off</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(145deg, #1a2639 0%, #0d1b2a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, 'Roboto', monospace;
+            padding: 1.5rem;
+        }
+
+        .card {
+            background: rgba(18, 25, 40, 0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 3rem;
+            padding: 2rem 2rem 2.5rem;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 550px;
+            transition: all 0.2s ease;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #f0f3fa, #cbd5ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            margin-bottom: 0.6rem;
+        }
+
+        .sub {
+            text-align: center;
+            color: #9aa9c1;
+            font-size: 0.85rem;
+            font-family: monospace;
+            background: #0f172ad9;
+            display: inline-block;
+            width: auto;
+            margin: 0 auto 1.5rem;
+            padding: 0.35rem 1rem;
+            border-radius: 40px;
+            backdrop-filter: blur(2px);
+            letter-spacing: 0.3px;
+        }
+
+        .status-badge {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 2rem 0 1.8rem;
+        }
+
+        .status-pill {
+            background: #0f121c;
+            border-radius: 160px;
+            padding: 1rem 2.4rem;
+            box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .status-text {
+            font-size: 4rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            font-family: 'Segoe UI', 'Inter', 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: 0.2s;
+        }
+
+        /* изменения стиля в зависимости от data-status */
+        .status-pill[data-status="on"] {
+            background: radial-gradient(ellipse at 30% 35%, #1f5e2e, #0a2f1a);
+            box-shadow: 0 0 14px #2ecc71aa, 0 8px 20px rgba(0,0,0,0.3);
+            border-color: #6eff9e;
+        }
+
+        .status-pill[data-status="on"] .status-text {
+            color: #d0ffd0;
+            text-shadow: 0 0 8px #2eff7a;
+        }
+
+        .status-pill[data-status="off"] {
+            background: radial-gradient(ellipse at 30% 35%, #751a1a, #3a0a0a);
+            box-shadow: 0 0 12px #ff5757aa, 0 8px 20px rgba(0,0,0,0.3);
+            border-color: #ff8a8a;
+        }
+
+        .status-pill[data-status="off"] .status-text {
+            color: #ffc9c9;
+            text-shadow: 0 0 6px #ff5e5e;
+        }
+
+        .info-panel {
+            background: #0b1120cc;
+            border-radius: 2rem;
+            padding: 1rem 1.4rem;
+            margin-top: 1rem;
+            border: 1px solid #2a3958;
+        }
+
+        .info-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #8f9fc0;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .command-example {
+            background: #010409;
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            padding: 12px 16px;
+            border-radius: 1.2rem;
+            color: #bbd7fb;
+            font-size: 0.9rem;
+            word-break: break-all;
+            border-left: 4px solid #3b82f6;
+            margin-bottom: 12px;
+        }
+
+        .command-example code {
+            background: #1e2a3e;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            color: #ffd966;
+        }
+
+        .note {
+            font-size: 0.8rem;
+            color: #7e8aa8;
+            border-top: 1px dashed #2a324b;
+            margin-top: 12px;
+            padding-top: 12px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .badge-mini {
+            background: #00000044;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+
+        .current-url {
+            background: #00000055;
+            border-radius: 14px;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-family: monospace;
+            text-align: center;
+            margin-top: 12px;
+            color: #b9c7e6;
+            word-break: break-all;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 1.2rem;
+            font-size: 0.7rem;
+            color: #5a6b8a;
+        }
+
+        @media (max-width: 480px) {
+            .status-text {
+                font-size: 2.5rem;
+            }
+            .card {
+                padding: 1.5rem;
+            }
+            .command-example {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="header">
+        <h1>⚡ СТАТУС СЕРВЕРА</h1>
+        <div style="text-align: center;">
+            <span class="sub">динамический индикатор · GET-параметр</span>
+        </div>
+    </div>
+
+    <div class="status-badge">
+        <div class="status-pill" id="statusPill" data-status="off">
+            <div class="status-text" id="statusText">OFF</div>
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <div class="info-title">
+            <i>📟</i> <span>УПРАВЛЕНИЕ ЧЕРЕЗ URL</span>
+        </div>
+        <div class="command-example">
+            🟢 <strong>Включить (ON)</strong><br>
+            <code>site.com/?status=on</code>  или  <code>site.com/?status=он</code>
+        </div>
+        <div class="command-example">
+            🔴 <strong>Выключить (OFF)</strong><br>
+            <code>site.com/?status=off</code>  или  <code>site.com/?status=офф</code>
+        </div>
+        <div class="note">
+            <span class="badge-mini">✅ регистр не важен</span>
+            <span class="badge-mini">🔄 обновление без перезагрузки</span>
+            <span class="badge-mini">📌 on/он/off/офф</span>
+        </div>
+        <div class="current-url" id="urlDisplay"></div>
+    </div>
+    <footer>
+        ✨ Параметр в URL → меняется статус
+    </footer>
+</div>
+
+<script>
+    (function() {
+        // DOM элементы
+        const pill = document.getElementById('statusPill');
+        const statusTextSpan = document.getElementById('statusText');
+
+        // Читает status или статус из URL, возвращает 'on'/'off'/null
+        function parseStatusFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let rawValue = null;
+            if (urlParams.has('status')) {
+                rawValue = urlParams.get('status');
+            } else if (urlParams.has('статус')) {
+                rawValue = urlParams.get('статус');
+            }
+            if (rawValue === null) return null;
+            
+            const val = rawValue.trim().toLowerCase();
+            if (val === 'on' || val === 'он') return 'on';
+            if (val === 'off' || val === 'офф') return 'off';
+            return null;
+        }
+
+        // Меняет внешний вид и текст плашки
+        function updateStatusUI(statusMode) {
+            if (statusMode !== 'on' && statusMode !== 'off') return false;
+            pill.setAttribute('data-status', statusMode);   // триггер для CSS
+            statusTextSpan.textContent = (statusMode === 'on') ? 'ON' : 'OFF';
+            return true;
+        }
+
+        // Каким должен быть статус при загрузке (по умолчанию OFF)
+        function getInitialStatus() {
+            const parsed = parseStatusFromUrl();
+            if (parsed === 'on') return 'on';
+            if (parsed === 'off') return 'off';
+            return 'off';
+        }
+
+        // Показывает текущий URL и распознанный параметр в нижнем блоке
+        function displayCurrentUrlInfo() {
+            const container = document.getElementById('urlDisplay');
+            if (!container) return;
+            
+            let fullUrl = window.location.href;
+            let shortUrl = fullUrl.length > 70 ? fullUrl.substring(0, 70) + '…' : fullUrl;
+            container.innerHTML = `🌐 Текущий URL: <code style="background:#0a0f1c; padding:2px 6px; border-radius:12px;">${escapeHtml(shortUrl)}</code>`;
+            
+            const params = new URLSearchParams(window.location.search);
+            let rawParam = params.get('status') || params.get('статус');
+            
+            const existingExtra = container.querySelector('.extra-param-info');
+            if (existingExtra) existingExtra.remove();
+            
+            const extra = document.createElement('div');
+            extra.className = 'extra-param-info';
+            extra.style.marginTop = '8px';
+            extra.style.fontSize = '0.7rem';
+            
+            if (rawParam) {
+                const parsed = parseStatusFromUrl();
+                let mode = '';
+                if (parsed === 'on') mode = '🟢 ON';
+                else if (parsed === 'off') mode = '🔴 OFF';
+                else mode = '⚪ не распознан';
+                extra.innerHTML = `📌 Параметр: <strong>${escapeHtml(rawParam)}</strong> → ${mode}`;
+            } else {
+                extra.innerHTML = `💡 Нет status/статус → OFF по умолчанию`;
+            }
+            container.appendChild(extra);
+        }
+
+        // Защита от вставки вредоносного кода через URL
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Основной обработчик: смотрит URL и обновляет UI
+        function applyStatusFromUrl() {
+            const newStatus = parseStatusFromUrl();
+            if (newStatus === 'on' || newStatus === 'off') {
+                updateStatusUI(newStatus);
+            } else {
+                // невалидный параметр — ничего не трогаем
+                const current = pill.getAttribute('data-status');
+                if (current !== 'on' && current !== 'off') updateStatusUI('off');
+            }
+            displayCurrentUrlInfo();
+        }
+
+        // Реакция на кнопки "назад"/"вперёд"
+        function onHistoryChange() {
+            applyStatusFromUrl();
+        }
+
+        // Запуск при загрузке страницы
+        function init() {
+            const initial = getInitialStatus();
+            updateStatusUI(initial);
+            displayCurrentUrlInfo();
+            
+            // синхронизация data-status и URL на случай, если они разошлись
+            const currentData = pill.getAttribute('data-status');
+            const recognized = parseStatusFromUrl();
+            if (recognized === 'on' && currentData !== 'on') updateStatusUI('on');
+            if (recognized === 'off' && currentData !== 'off') updateStatusUI('off');
+            
+            window.addEventListener('popstate', onHistoryChange);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+</script>
+</body>
+</html>
